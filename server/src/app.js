@@ -1,0 +1,13 @@
+import express from 'express';
+import cors from 'cors';
+import authRoutes from './routes/auth.js';
+import appointmentRoutes from './routes/appointments.js';
+const app = express();
+app.use(cors({ origin: process.env.CLIENT_ORIGIN || 'http://localhost:5173' }));
+app.use(express.json());
+app.get('/api/health', (_req, res) => res.json({ status: 'ok', service: 'vitalsync-api' }));
+app.use('/api/auth', authRoutes);
+app.use('/api/appointments', appointmentRoutes);
+app.use((_req, res) => res.status(404).json({ success: false, error: { code: 'NOT_FOUND', message: 'Route not found.' } }));
+app.use((error, _req, res, _next) => { console.error(error); res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR', message: 'Internal server error.' } }); });
+export default app;
